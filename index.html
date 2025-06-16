@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>윤선생 리얼스피치 WriteBack</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        /* --- 기본 스타일 및 레이아웃 --- */
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        #container {
+            width: 100%;
+            max-width: 768px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            position: relative;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* --- 헤더 섹션 --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-section h1 {
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+
+        .reset-btn-container {
+            text-align: right;
+            margin-top: 1rem;
+        }
+
+        #reset-btn {
+            background-color: #f80909c5;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #reset-btn:hover {
+            background-color: #475569;
+        }
+
+        /* --- 탭 --- */
+        nav {
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .tab {
+            background-color: #e0e7ff;
+            color: #3b82f6;
+            border: 2px solid transparent;
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab.active {
+            background-color: #1e40af;
+            color: #ffffff;
+            border: 3px solid #1e3a8a;
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+            transform: translateY(-2px);
+            font-weight: 700;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: #bfdbfe;
+            color: #1e40af;
+            border-color: #93c5fd;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.15);
+        }
+
+        /* '최종 결과물 생성' 탭 커스텀 스타일 (녹색 테마) 강제 오버라이드 */
+        #tab-final {
+            background-color: #16a34a !important; /* 연한 녹색 배경 */
+            color: #f5f7f6 !important;            /* 녹색 텍스트 */
+            border: 2px solid transparent !important;
+        }
+
+        #tab-final:hover:not(.active) {
+            background-color: #07c911 !important; /* 진한 녹색 배경 */
+            color: #ffffff !important;            /* 흰색 텍스트 */
+            border-color: #15803d !important;
+        }
+        
+        .tab.active.final-theme {
+            background-color: #16a34a !important; /* 활성 상태: 진한 녹색 배경 */
+            color: #ffffff !important;            /* 흰색 텍스트 */
+            border: 3px solid #15803d !important;
+            box-shadow: 0 6px 12px rgba(34, 197, 94, 0.25) !important;
+        }
+        /* --// '최종 결과물 생성' 탭 커스텀 스타일 */
+
+        .tab.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background-color: #ffffff;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- 사용자 정보 입력 --- */
+        .user-info {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-info input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #475569;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .user-info input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        /* --- 입력 영역 --- */
+        .input-area {
+            width: 100%;
+            min-height: 180px;
+            padding: 1.25rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            background-color: #f8fafc;
+            resize: vertical;
+            transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #334155;
+        }
+
+        .input-area:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .input-area.has-image {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+        }
+
+        /* --- 최종 결과물 페이지 녹색 테마 --- */
+        .final-theme .input-area {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .final-theme .input-area:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+        }
+
+        .final-theme .user-info input {
+            border-color: #bbf7d0;
+            background-color: #f0fdf4;
+        }
+
+        .final-theme .user-info input:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        /* --- 아이콘 버튼 --- */
+        .action-icons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1.5rem;
+            color: #64748b;
+        }
+
+        .icon-btn:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .icon-btn input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .icon-btn-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* --- 파일 정보 & OCR 상태 --- */
+        .file-info,
+        .ocr-status {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .file-info {
+            background-color: #e0f2fe;
+            border: 1px solid #93c5fd;
+            color: #1d4ed8;
+            display: none;
+        }
+
+        .file-info.show {
+            display: flex;
+        }
+
+        .file-info .file-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .ocr-status {
+            background-color: #fefce8;
+            border: 1px solid #fde68a;
+            color: #b45309;
+            display: none;
+        }
+
+        .ocr-status.show {
+            display: flex;
+        }
+
+        .ocr-status .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #b45309;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- 일반 버튼 --- */
+        button:not(.icon-btn):not(#reset-btn),
+        a.button {
+            background-color: #3b82f6;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.85rem 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            margin-top: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+        }
+
+        button:hover:not(.icon-btn):not(#reset-btn),
+        a.button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        button:disabled, a.button:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 최종 결과물 페이지 버튼 녹색 테마 */
+        .final-theme button:not(.icon-btn):not(#reset-btn) {
+            background-color: #16a34a;
+            box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
+        }
+
+        .final-theme button:not(.icon-btn):not(#reset-btn):hover {
+            background-color: #15803d;
+            box-shadow: 0 6px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        /* --- 버튼 그룹 --- */
+        .btn-group {
+            text-align: right;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .btn-group button {
+            margin-top: 0;
+            background-color: #64748b;
+            box-shadow: none;
+        }
+
+        .btn-group button:hover {
+            background-color: #475569;
+            transform: translateY(-2px);
+        }
+
+        /* --- Edit 안내 문구 --- */
+        .edit-instruction {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: #1e40af;
+            text-align: center;
+        }
+
+        /* --- 스피너 (TTS) --- */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #ffffff;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-left: 0.8rem;
+        }
+
+        #tts-spinner {
+            border-color: #3b82f6;
+            border-top-color: transparent;
+        }
+
+        /* --- 결과 박스 --- */
+        .box,
+        .model-box {
+            background-color: #f1f5f9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .box h2,
+        .model-box h2 {
+            margin: 0 0 1rem;
+            color: #1e3a8a;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .model-box {
+            background-color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            border: 1px solid #d1d5db;
+        }
+
+        /* --- 피드백 카테고리 스타일 --- */
+        .feedback-container {
+            margin-top: 1rem;
+        }
+
+        .feedback-category {
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-category:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feedback-category h3 {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .feedback-category h3 i {
+            margin-right: 8px;
+            font-size: 1.4rem;
+        }
+
+        .overview-category {
+            background-color: #f5f3ff;
+            border-left: 5px solid #8b5cf6;
+        }
+
+        .overview-category > div {
+            padding-left: 1.5em;
+            text-indent: -1.5em;
+        }
+
+        .grammar {
+            background-color: #fdeded;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .vocabulary {
+            background-color: #ebf5fb;
+            border-left: 5px solid #3498db;
+        }
+
+        .expression {
+            background-color: #f4ecf7;
+            border-left: 5px solid #9b59b6;
+        }
+
+        .strengths {
+            background-color: #ebfaf0;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .original-text {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-left: 3px solid #94a3b8;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-style: italic;
+            color: #475569;
+            border-radius: 4px;
+        }
+
+        .original-text::before {
+            content: '원문';
+            display: block;
+            font-weight: 600;
+            font-style: normal;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            color: #64748b;
+        }
+
+        /* --- 수정글 섹션 스타일 --- */
+        .corrected-section {
+            background-color: #ecfdf5;
+            border-left: 5px solid #10b981;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+
+        .corrected-section h3 {
+            display: flex;
+            align-items: center;
+            color: #047857;
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .corrected-section h3 i {
+            margin-right: 10px;
+        }
+
+        .corrected-content {
+            background-color: #ffffff;
+            padding: 18px;
+            border-radius: 6px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #1f2937;
+            border: 1px solid #d1fae5;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        /* --- 인라인 Print 옵션 --- */
+        .print-options-inline {
+            margin-top: 1.5rem;
+            padding: 1.25rem;
+            background-color: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .print-options-inline label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .print-options-inline input[type="checkbox"] {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        
+        .print-options-inline button {
+            margin-top: 0;
+            margin-left: auto;
+            background-color: #10b981;
+        }
+
+        .print-options-inline button:hover {
+            background-color: #059669;
+        }
+
+        /* --- 최종 산출물 코너 특정 스타일 --- */
+        #final-section .button-area {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 1.5rem;
+        }
+
+        #final-section .audio-controls-area {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        #final-section #tts-play-btn {
+            width: fit-content;
+            margin-top: 0;
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+            background-color: #6366f1;
+        }
+
+        #final-section #tts-play-btn:hover {
+            background-color: #4f46e5;
+        }
+
+        .final-theme #final-section #tts-play-btn {
+            background-color: #16a34a;
+            box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
+        }
+
+        .final-theme #final-section #tts-play-btn:hover {
+            background-color: #15803d;
+        }
+
+        #final-section #tts-audio-final {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #a78bfa;
+            background-color: #f5f3ff;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        #final-section #tts-download-btn {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            display: inline-block;
+            transition: color 0.2s ease-in-out;
+            margin-top: -0.5rem;
+        }
+
+        #final-section #tts-download-btn:hover {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        #final-section .print-button-bottom {
+            margin-top: 2.5rem;
+            text-align: left;
+            width: 100%;
+        }
+        
+        #final-section .print-button-bottom .button {
+            width: fit-content;
+        }
+
+        /* --- 모바일 반응형 디자인 --- */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            #container {
+                padding: 1.5rem;
+                margin: 0;
+                max-width: 100%;
+                box-shadow: none;
+                border-radius: 8px;
+            }
+            
+            .header-section h1 {
+                font-size: 1.6rem;
+                margin-bottom: 0.3rem;
+                line-height: 1.3;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+            }
+            
+            .user-info input {
+                width: 100%;
+                padding: 0.8rem;
+                font-size: 1rem;
+                border-radius: 6px;
+            }
+            
+            nav {
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .tab {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+                width: 100%;
+                text-align: center;
+            }
+            
+            .input-area {
+                min-height: 150px;
+                padding: 1rem;
+                font-size: 1rem;
+            }
+            
+            .action-icons {
+                justify-content: center;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .icon-btn-container {
+                gap: 0.3rem;
+            }
+            
+            .icon-btn {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+            
+            .icon-btn-label {
+                font-size: 0.8rem;
+            }
+            
+            button:not(.icon-btn):not(#reset-btn),
+            a.button {
+                padding: 0.9rem 1.5rem;
+                font-size: 1rem;
+                width: 100%;
+                margin-top: 1rem;
+            }
+            
+            .feedback-category,
+            .overview-category {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .feedback-category h3,
+            .overview-category h3 {
+                font-size: 1.1rem;
+            }
+            
+            .print-options-inline {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+            
+            .print-options-inline button {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            #container {
+                padding: 1rem;
+            }
+            
+            .header-section h1 {
+                font-size: 1.4rem;
+            }
+            
+            .tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .input-area {
+                min-height: 120px;
+                padding: 0.75rem;
+            }
+        }
+
+        /* 인쇄 시 스타일 */
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 1rem;
+                color: #000000;
+                font-family: 'Segoe UI', sans-serif;
+                line-height: 1.4;
+            }
+            
+            #container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+                margin: 0;
+            }
+            
+            .print-header {
+                text-align: center;
+                padding: 15px 0;
+                border-bottom: 2px solid #1e3a8a;
+                margin-bottom: 15px;
+                page-break-inside: avoid;
+            }
+            
+            .print-header .title {
+                font-size: 24px;
+                font-weight: bold;
+                color: #1e3a8a;
+                margin: 0;
+                text-align: center;
+            }
+            
+            .user-info-print {
+                margin-bottom: 15px;
+                padding: 8px;
+                background-color: #f8fafc;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            
+            nav, button, a.button, .reset-btn-container, .action-icons, .btn-group,
+            .print-options-inline, .edit-instruction {
+                display: none !important;
+            }
+            
+            h1, h2 {
+                color: #000000 !important;
+                text-align: left;
+                page-break-after: avoid;
+                margin-top: 1rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            h3 {
+                margin-top: 0.8rem;
+                margin-bottom: 0.4rem;
+                page-break-after: avoid;
+            }
+            
+            .box, .model-box, .corrected-section {
+                background-color: #ffffff;
+                border: 1px solid #cccccc;
+                padding: 1rem;
+                margin-top: 0.8rem;
+                margin-bottom: 0.8rem;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            
+            .feedback-category, .overview-category {
+                page-break-inside: avoid;
+                margin-bottom: 0.8rem;
+                padding: 8px 12px;
+            }
+            
+            .original-text {
+                margin: 0.5rem 0;
+                padding: 6px 10px;
+            }
+            
+            .original-text::before {
+                margin-bottom: 3px;
+            }
+            
+            p, div {
+                margin-top: 0.3rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .input-area {
+                border: 1px dashed #cccccc;
+                background-color: #ffffff;
+                padding: 0.8rem;
+                min-height: auto;
+                margin: 0.5rem 0;
+            }
+            
+            .original-content img {
+                max-width: 70%; /* 이미지 크기 축소 */
+                height: auto;
+                page-break-inside: avoid;
+                margin: 0.5rem 0;
+            }
+            
+            hr {
+                margin: 0.3rem 0;
+            }
+        }
+
+        /* 웹 화면에서는 인쇄 관련 요소 숨김 */
+        .print-header, .user-info-print {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div class="header-section">
+            <h1>✨ 윤선생 리얼스피치 WriteBack ✨</h1>
+        </div>
+        <div class="reset-btn-container">
+            <button id="reset-btn">Reset</button>
+        </div>
+
+
+        <nav>
+            <button id="tab-feedback" class="tab active">피드백 받기</button>
+            <button id="tab-final" class="tab">최종 결과물 생성</button>
+        </nav>
+
+        <section id="feedback-section" class="section active">
+            <form id="feedback-form">
+                <label for="contentText-feedback"> 📪영작한 내용을 입력하거나 찍어서 업로드해 주세요.</label>
+                <div class="user-info">
+                    <input type="text" id="user-name-feedback" placeholder="이름" />
+                    <input type="text" id="user-school-feedback" placeholder="학교(학년)" />
+                </div>
+                <div class="action-icons">
+                    <div class="icon-btn-container">
+                        <button type="button" class="icon-btn" title="사진 촬영">📸
+                            <input type="file" id="contentFile-camera-feedback" accept="image/*" capture="environment" />
+                        </button>
+                        <span class="icon-btn-label">사진 촬영</span>
+                    </div>
+                    <div class="icon-btn-container">
+                        <button type="button" class="icon-btn" title="이미지 선택">🖼️
+                            <input type="file" id="contentFile-gallery-feedback" accept="image/*" />
+                        </button>
+                        <span class="icon-btn-label">이미지 업로드</span>
+                    </div>
+                </div>
+                <textarea id="contentText-feedback" class="input-area" placeholder="여기에 텍스트를 입력하세요."></textarea>
+                <div class="file-info" id="file-info-feedback"><span class="file-name"></span></div>
+                <div class="ocr-status" id="ocr-status-feedback">
+                    <div class="spinner"></div><span>이미지에서 텍스트를 추출 중입니다...</span>
+                </div>
+                <button type="submit" id="submit-feedback-btn">피드백 받기 <span id="submit-spinner-feedback"
+                        class="spinner"></span></button>
+            </form>
+            <div id="feedback-result"></div>
+        </section>
+
+        <section id="final-section" class="section">
+            <form id="final-form">
+                <label for="contentText-final">❇️최종 결과물을 위해 텍스트를 입력하거나 찍어서 업로드해 주세요.</label>
+                <div class="user-info">
+                    <input type="text" id="user-name-final" placeholder="이름" />
+                    <input type="text" id="user-school-final" placeholder="학교" />
+                </div>
+                <div class="action-icons">
+                    <div class="icon-btn-container">
+                        <button type="button" class="icon-btn" title="사진 촬영">📸
+                            <input type="file" id="contentFile-camera-final" accept="image/*" capture="environment" />
+                        </button>
+                        <span class="icon-btn-label">사진 촬영</span>
+                    </div>
+                    <div class="icon-btn-container">
+                        <button type="button" class="icon-btn" title="이미지 선택">🖼️
+                            <input type="file" id="contentFile-gallery-final" accept="image/*" />
+                        </button>
+                        <span class="icon-btn-label">이미지 업로드</span>
+                    </div>
+                </div>
+                <textarea id="contentText-final" class="input-area" placeholder="여기에 텍스트를 입력하세요."></textarea>
+                <div class="file-info" id="file-info-final"><span class="file-name"></span></div>
+                <div class="ocr-status" id="ocr-status-final">
+                    <div class="spinner"></div><span>이미지에서 텍스트를 추출 중입니다...</span>
+                </div>
+                <button type="submit" id="submit-final-btn">최종 결과 생성 <span id="submit-spinner-final"
+                        class="spinner"></span></button>
+            </form>
+            <div id="final-result"></div>
+        </section>
+    </div>
+
+    <script>
+        const WORKER_URL = 'https://writing-feedback-app.sehyunglee2015.workers.dev';
+        // const PROXY_URL = WORKER_URL + '/proxy'; // 이제 /proxy를 직접 사용하므로 이 변수는 불필요
+        window.feedbackFileURL = '';
+        window.finalFileURL = '';
+
+        // PDF 파일명 생성 함수
+        function generatePDFFileName(userName) {
+            const today = new Date();
+            const dateStr = today.getFullYear() + 
+                           String(today.getMonth() + 1).padStart(2, '0') + 
+                           String(today.getDate()).padStart(2, '0');
+            
+            if (userName && userName.trim()) {
+                return `${userName.trim()}_리얼스피치_${dateStr}`;
+            } else {
+                return `Writing_${dateStr}`;
+            }
+        }
+
+        // 텍스트 정리 함수
+        function cleanExtractedText(text) {
+            if (!text || typeof text !== 'string') {
+                return '';
+            }
+            
+            text = text.replace(/[ \t]+/g, ' ');
+            text = text.replace(/\n{3,}/g, '\n\n');
+            text = text.split('\n').map(line => line.trim()).join('\n');
+            text = text.replace(/(\n\s*){3,}/g, '\n\n');
+            text = text.replace(/\.\s{2,}/g, '. ');
+            text = text.replace(/\?\s{2,}/g, '? ');
+            text = text.replace(/!\s{2,}/g, '! ');
+            text = text.replace(/,\s{2,}/g, ', ');
+            
+            return text.trim();
+        }
+
+        // 이미지 파일에서 Base64 문자열을 추출하는 헬퍼 함수
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    // "data:image/jpeg;base64," 같은 프리픽스를 제거하고 순수 데이터만 반환
+                    resolve(reader.result.split(',')[1]);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // 개선된 OCR 함수 (Google Gemini Vision API 사용)
+        async function doOCR(file, section) {
+            const status = document.getElementById(`ocr-status-${section}`);
+            const textArea = document.getElementById(`contentText-${section}`);
+            
+            status.classList.add('show');
+            
+            try {
+                if (file.size > 10 * 1024 * 1024) {
+                    throw new Error('파일 크기가 너무 큽니다. 10MB 이하의 이미지를 사용해주세요.');
+                }
+                
+                if (!file.type.startsWith('image/')) {
+                    throw new Error('이미지 파일만 업로드 가능합니다.');
+                }
+
+                // 이미지를 Base64로 인코딩
+                const base64Image = await getBase64(file);
+
+                const requestBody = {
+                    image: base64Image,
+                    mimeType: file.type
+                };
+                
+                // 새로운 /proxy 엔드포인트로 요청
+                const resp = await fetch(`${WORKER_URL}/proxy`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                if (!resp.ok) {
+                    const errorData = await resp.json();
+                    throw new Error(`API 오류: ${errorData.error || resp.statusText}`);
+                }
+                
+                // 백엔드에서 가공해준 텍스트를 바로 사용
+                const data = await resp.json();
+                const extractedText = data.extractedText || '';
+                
+                if (extractedText) {
+                    const cleanedText = cleanExtractedText(extractedText);
+                    textArea.value = cleanedText;
+                } else {
+                    textArea.value = '텍스트를 인식할 수 없습니다. 이미지가 선명한지 확인하고 다시 시도해주세요.';
+                }
+                
+            } catch (error) {
+                console.error('OCR 오류:', error);
+                textArea.value = `OCR 처리 중 오류가 발생했습니다: ${error.message}. 다시 시도해주세요.`;
+            } finally {
+                status.classList.remove('show');
+            }
+        }
+
+        // Reset
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            ['feedback', 'final'].forEach(sec => {
+                document.getElementById(`contentText-${sec}`).value = '';
+                document.getElementById(`file-info-${sec}`).classList.remove('show');
+                document.getElementById(`ocr-status-${sec}`).classList.remove('show');
+                document.getElementById(`contentText-${sec}`).classList.remove('has-image');
+                window[`${sec}FileURL`] = '';
+                document.getElementById(`${sec}-result`).innerHTML = '';
+                document.getElementById(`user-name-${sec}`).value = '';
+                document.getElementById(`user-school-${sec}`).value = '';
+            });
+        });
+
+        // Tab
+        document.getElementById('tab-feedback').addEventListener('click', () => {
+            document.getElementById('feedback-section').classList.add('active');
+            document.getElementById('tab-feedback').classList.add('active');
+            document.getElementById('final-section').classList.remove('active', 'final-theme');
+            document.getElementById('tab-final').classList.remove('active', 'final-theme');
+        });
+        
+        document.getElementById('tab-final').addEventListener('click', () => {
+            document.getElementById('final-section').classList.add('active', 'final-theme');
+            document.getElementById('tab-final').classList.add('active', 'final-theme');
+            document.getElementById('feedback-section').classList.remove('active');
+            document.getElementById('tab-feedback').classList.remove('active');
+        });
+
+        // File upload & OCR
+        ['feedback', 'final'].forEach(section => {
+            ['camera', 'gallery'].forEach(src => {
+                document.getElementById(`contentFile-${src}-${section}`).addEventListener('change', async e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    if (!navigator.onLine) {
+                        alert('인터넷 연결을 확인하고 다시 시도해주세요.');
+                        return;
+                    }
+                    
+                    const url = URL.createObjectURL(file);
+                    window[`${section}FileURL`] = url;
+                    const info = document.getElementById(`file-info-${section}`);
+                    info.querySelector('.file-name').textContent = file.name;
+                    info.classList.add('show');
+                    document.getElementById(`contentText-${section}`).classList.add('has-image');
+                    
+                    await doOCR(file, section);
+                });
+            });
+        });
+
+        // 피드백 처리 함수
+        function processFeedback(feedback) {
+            const overviewPattern = /(?:총평|전체\s*평가|종합\s*평가)[\s]*:([\s\S]*?)(?=(?:문법\s*오류|어휘\s*개선|표현\s*향상|잘한\s*점)\s*:|$)/i;
+            const grammarPattern = /문법\s*오류\s*:([\s\S]*?)(?=(?:총평|전체\s*평가|종합\s*평가|어휘\s*개선|표현\s*향상|잘한\s*점)\s*:|$)/i;
+            const vocabPattern = /어휘\s*개선\s*:([\s\S]*?)(?=(?:총평|전체\s*평가|종합\s*평가|문법\s*오류|표현\s*향상|잘한\s*점)\s*:|$)/i;
+            const expressionPattern = /표현\s*향상\s*:([\s\S]*?)(?=(?:총평|전체\s*평가|종합\s*평가|문법\s*오류|어휘\s*개선|잘한\s*점)\s*:|$)/i;
+            const strengthsPattern = /잘한\s*점\s*:([\s\S]*?)(?=(?:총평|전체\s*평가|종합\s*평가|문법\s*오류|어휘\s*개선|표현\s*향상)\s*:|$)/i;
+            
+            let html = '<div class="feedback-container">';
+            
+            const extractContent = (pattern) => {
+                const match = feedback.match(pattern);
+                if (match && match[1]) {
+                    // 끝에 붙은 숫자 제거 (예: 2. 제거)
+                    return match[1].trim().replace(/(\r\n|\n|\r|\s)*\d+\.\s*$/, "").trim();
+                }
+                return null;
+            };
+
+            const overviewContent = extractContent(overviewPattern);
+            if (overviewContent) {
+                html += `
+                    <div class="overview-category">
+                        <h3><i class="fas fa-star"></i> 총평</h3>
+                        <div>${overviewContent.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+            
+            const grammarContent = extractContent(grammarPattern);
+            if (grammarContent) {
+                html += `
+                    <div class="feedback-category grammar">
+                        <h3><i class="fas fa-exclamation-circle"></i> 문법 오류</h3>
+                        ${extractFeedbackPoints(grammarContent)}
+                    </div>
+                `;
+            }
+            
+            const vocabContent = extractContent(vocabPattern);
+            if (vocabContent) {
+                html += `
+                    <div class="feedback-category vocabulary">
+                        <h3><i class="fas fa-book"></i> 어휘 개선</h3>
+                        ${extractFeedbackPoints(vocabContent)}
+                    </div>
+                `;
+            }
+            
+            const expressionContent = extractContent(expressionPattern);
+            if (expressionContent) {
+                html += `
+                    <div class="feedback-category expression">
+                        <h3><i class="fas fa-pencil-alt"></i> 표현 향상</h3>
+                        ${extractFeedbackPoints(expressionContent)}
+                    </div>
+                `;
+            }
+            
+            const strengthsContent = extractContent(strengthsPattern);
+            if (strengthsContent) {
+                html += `
+                    <div class="feedback-category strengths">
+                        <h3><i class="fas fa-thumbs-up"></i> 잘한 점</h3>
+                        ${extractFeedbackPoints(strengthsContent)}
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function extractFeedbackPoints(content) {
+            // 원문 표시 로직 제거, 피드백만 출력
+            const points = content.split(/\n\s*\n+/).filter(p => p.trim());
+            let html = '';
+            
+            points.forEach(point => {
+                const cleanedPoint = point.trim().replace(/^\d+\.\s*/, '');
+                if (cleanedPoint) {
+                    html += `
+                        <div class="feedback-point">${cleanedPoint.replace(/\n/g, '<br>')}</div>
+                        <hr style="border: 0; height: 1px; background-color: #e2e8f0; margin: 10px 0;">
+                    `;
+                }
+            });
+            
+            return html.replace(/<hr[^>]*>$/i, '');
+        }
+
+        // 인쇄용 이미지 회전 함수
+        function getRotatedImageForPrint(imageUrl, callback) {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const isLandscape = img.width > img.height;
+                
+                if (isLandscape) {
+                    canvas.width = img.height;
+                    canvas.height = img.width;
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(90 * Math.PI / 180);
+                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+                } else {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                }
+                
+                const rotatedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                callback(rotatedDataUrl);
+            };
+            img.src = imageUrl;
+        }
+
+        // 통합 인쇄 HTML 생성 및 인쇄 함수
+        function generateAndPrintHTML(imageUrl, orig, fbCheck, corr, name, school, type) {
+            const fileName = generatePDFFileName(name);
+            
+            let userInfoHTML = '';
+            if (name?.trim() || school?.trim()) {
+                userInfoHTML = `<div class="user-info-print">`;
+                if (name?.trim()) userInfoHTML += `<strong>이름:</strong> ${name.trim()}`;
+                if (name?.trim() && school?.trim()) userInfoHTML += ` &nbsp;&nbsp; `;
+                if (school?.trim()) userInfoHTML += `<strong>학교:</strong> ${school.trim()}`;
+                userInfoHTML += `</div>`;
+            }
+            
+            let html = `<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>${fileName}</title>
+    <style>
+        @page {
+            margin: 15mm;
+            size: A4;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: white;
+            color: black;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+        
+        .print-header {
+            text-align: center;
+            padding: 10px 0;
+            border-bottom: 2px solid #1e3a8a;
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+        
+        .print-header .title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 0;
+            text-align: center;
+        }
+        
+        .user-info-print {
+            margin-bottom: 12px;
+            padding: 6px 8px;
+            background-color: #f8fafc;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        h1, h2 {
+            color: #1e3a8a;
+            page-break-after: avoid;
+            margin-top: 0.8rem;
+            margin-bottom: 0.4rem;
+            font-size: 16px;
+        }
+        
+        h3 {
+            margin-top: 0.6rem;
+            margin-bottom: 0.3rem;
+            page-break-after: avoid;
+            font-size: 14px;
+        }
+        
+        .feedback-category, .overview-category, .corrected-section {
+            page-break-inside: avoid;
+            margin-bottom: 0.6rem;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+        
+        .overview-category {
+            background-color: #f5f3ff;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .grammar {
+            background-color: #fdeded;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .vocabulary {
+            background-color: #ebf5fb;
+            border-left: 4px solid #3498db;
+        }
+        
+        .expression {
+            background-color: #f4ecf7;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .strengths {
+            background-color: #ebfaf0;
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .corrected-section {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+        }
+        
+        .original-text {
+            background-color: rgba(248, 250, 252, 0.8);
+            border-left: 2px solid #94a3b8;
+            padding: 4px 8px;
+            margin: 0.3rem 0;
+            font-style: italic;
+            color: #475569;
+            border-radius: 2px;
+            font-size: 11px;
+        }
+        
+        .original-text::before {
+            content: '원문';
+            display: block;
+            font-weight: 600;
+            font-style: normal;
+            font-size: 9px;
+            margin-bottom: 2px;
+            color: #64748b;
+        }
+        
+        hr {
+            margin: 0.2rem 0;
+            border: 0;
+            height: 1px;
+            background-color: #e2e8f0;
+        }
+        
+        .corrected-content, .model-box {
+            background-color: #ffffff;
+            font-size: 12px;
+            line-height: 1.6;
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 0.3rem 0;
+        }
+        
+        .original-content {
+            margin: 0.5rem 0;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f8fafc;
+        }
+        
+        .original-content img {
+            max-width: 70%;
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            margin: 0.2rem 0;
+        }
+        
+        p, div {
+            margin-top: 0.2rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .feedback-point {
+            margin: 0.2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="print-header">
+        <h1 class="title">윤선생 리얼스피치 2025</h1>
+    </div>
+    
+    ${userInfoHTML}
+    
+    <h2>${type === 'feedback' ? '피드백 결과' : '최종 결과'}</h2>`;
+
+            if (orig) {
+                html += '<h3>원본</h3><div class="original-content">';
+                if (imageUrl) {
+                    html += `<img src="${imageUrl}" alt="원본 이미지" />`;
+                } else {
+                    const textContent = type === 'feedback' ? 
+                        document.getElementById('contentText-feedback').value : 
+                        document.getElementById('contentText-final').value;
+                    html += `<div style="white-space: pre-wrap;">${textContent || '내용 없음'}</div>`;
+                }
+                html += '</div>';
+            }
+
+            if (fbCheck && type === 'feedback') {
+                const feedbackContent = document.getElementById('fb-content');
+                if (feedbackContent) {
+                    html += '<h3>피드백</h3>' + feedbackContent.outerHTML;
+                }
+            }
+
+            if (corr) {
+                const correctedElement = type === 'feedback' ? 
+                    document.getElementById('fb-corrected') : 
+                    document.getElementById('fn-corrected');
+                
+                if (correctedElement) {
+                    html += '<h3>수정글</h3>';
+                    html += `<div class="corrected-section">`;
+                    html += `<div class="corrected-content">${correctedElement.innerHTML}</div>`;
+                    html += '</div>';
+                }
+            }
+
+            html += `
+</body>
+</html>`;
+
+            try {
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                if (!printWindow) {
+                    alert('팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해주세요.');
+                    return;
+                }
+                
+                printWindow.document.open();
+                printWindow.document.write(html);
+                printWindow.document.close();
+                
+                printWindow.onload = function() {
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.onafterprint = function() {
+                            printWindow.close();
+                        };
+                    }, 1000);
+                };
+            } catch (error) {
+                console.error('인쇄 오류:', error);
+                alert('인쇄 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        }
+
+        // Feedback submit
+        document.getElementById('feedback-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const contentText = document.getElementById('contentText-feedback').value.trim();
+            if (!contentText) {
+                 alert("영작한 내용을 입력하거나 이미지 업로드 후 실행해주세요!");
+                 return;
+            }
+            const btn = document.getElementById('submit-feedback-btn'),
+                  sp = document.getElementById('submit-spinner-feedback');
+            btn.disabled = true;
+            sp.style.display = 'inline-block';
+            try {
+                const res = await fetch(`${WORKER_URL}/api/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contentText })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || '알 수 없는 서버 오류');
+                }
+
+                const { feedback, modelAnswer } = await res.json();
+                const container = document.getElementById('feedback-result');
+                
+                const formattedFeedback = processFeedback(feedback);
+                
+                container.innerHTML = `
+                  <p style="text-align: left;">
+                    📢 AI는 실수를 할 수 있습니다. 꼭 생성된 내용을 확인 후 필요한 부분은 수정하셔서 이용해주세요~!
+                  </p>
+                  <div class="box" id="fb-box">
+                    <h2>피드백</h2>
+                    <div class="edit-instruction">내용에서 원하는 부분을 수정하려면 Edit 버튼을 누른 후 입력하시고 Save를 눌러 저장해주세요.</div>
+                    <div id="fb-content">${formattedFeedback}</div>
+                  </div>
+                  <div class="corrected-section" id="fb-corr-box">
+                    <h3><i class="fas fa-check-circle"></i> 수정글</h3>
+                    <div class="edit-instruction">내용에서 원하는 부분을 수정하려면 Edit 버튼을 누른 후 입력하시고 Save를 눌러 저장해주세요.</div>
+                    <div class="corrected-content" id="fb-corrected">${modelAnswer.replace(/\n/g,'<br>')}</div>
+                  </div>
+                  <button id="print-feedback-btn">인쇄</button>
+                  <div class="print-options-inline" id="print-options-feedback" style="display:none;">
+                      <label><input type="checkbox" id="print_orig_fb" checked> 원본</label>
+                      <label><input type="checkbox" id="print_fb_fb" checked> 피드백</label>
+                      <label><input type="checkbox" id="print_corr_fb" checked> 수정글</label>
+                      <button id="confirm-print-feedback-btn">Confirm</button>
+                  </div>
+                `;
+
+                // Edit/Save 버튼 추가 (피드백)
+                const fbContent = document.getElementById('fb-content');
+                fbContent.setAttribute('contenteditable', 'false');
+                const fbEditBtn = document.createElement('button');
+                fbEditBtn.textContent = 'Edit';
+                fbEditBtn.className = 'btn-group-btn';
+                const fbSaveBtn = document.createElement('button');
+                fbSaveBtn.textContent = 'Save';
+                fbSaveBtn.className = 'btn-group-btn';
+                fbSaveBtn.style.display = 'none';
+                const fbWrapper = document.createElement('div');
+                fbWrapper.className = 'btn-group';
+                fbWrapper.append(fbEditBtn, fbSaveBtn);
+                document.getElementById('fb-box').append(fbWrapper);
+                
+                fbEditBtn.addEventListener('click', () => {
+                    fbContent.setAttribute('contenteditable', 'true');
+                    fbEditBtn.style.display = 'none';
+                    fbSaveBtn.style.display = 'inline-block';
+                    fbContent.focus();
+                });
+                fbSaveBtn.addEventListener('click', () => {
+                    fbContent.setAttribute('contenteditable', 'false');
+                    fbSaveBtn.style.display = 'none';
+                    fbEditBtn.style.display = 'inline-block';
+                });
+
+                // Edit/Save 버튼 추가 (수정글)
+                const corrContent = document.getElementById('fb-corrected');
+                corrContent.setAttribute('contenteditable', 'false');
+                const corrEditBtn = document.createElement('button');
+                corrEditBtn.textContent = 'Edit';
+                corrEditBtn.className = 'btn-group-btn';
+                const corrSaveBtn = document.createElement('button');
+                corrSaveBtn.textContent = 'Save';
+                corrSaveBtn.className = 'btn-group-btn';
+                corrSaveBtn.style.display = 'none';
+                const corrWrapper = document.createElement('div');
+                corrWrapper.className = 'btn-group';
+                corrWrapper.append(corrEditBtn, corrSaveBtn);
+                document.getElementById('fb-corr-box').append(corrWrapper);
+                
+                corrEditBtn.addEventListener('click', () => {
+                    corrContent.setAttribute('contenteditable', 'true');
+                    corrEditBtn.style.display = 'none';
+                    corrSaveBtn.style.display = 'inline-block';
+                    corrContent.focus();
+                });
+                corrSaveBtn.addEventListener('click', () => {
+                    corrContent.setAttribute('contenteditable', 'false');
+                    corrSaveBtn.style.display = 'none';
+                    corrEditBtn.style.display = 'inline-block';
+                });
+                
+                // Print inline
+                document.getElementById('print-feedback-btn').addEventListener('click', () => {
+                    document.getElementById('print-options-feedback').style.display = 'flex';
+                });
+                
+                document.getElementById('confirm-print-feedback-btn').addEventListener('click', () => {
+                    const orig = document.getElementById('print_orig_fb').checked;
+                    const fbCheck = document.getElementById('print_fb_fb').checked;
+                    const corr = document.getElementById('print_corr_fb').checked;
+                    const name = document.getElementById('user-name-feedback').value;
+                    const school = document.getElementById('user-school-feedback').value;
+                    
+                    document.getElementById('print-options-feedback').style.display = 'none';
+                    
+                    if (orig && window.feedbackFileURL && window.feedbackFileURL.startsWith('blob:')) {
+                        getRotatedImageForPrint(window.feedbackFileURL, (rotatedImageUrl) => {
+                            generateAndPrintHTML(rotatedImageUrl, orig, fbCheck, corr, name, school, 'feedback');
+                        });
+                    } else {
+                        generateAndPrintHTML(window.feedbackFileURL, orig, fbCheck, corr, name, school, 'feedback');
+                    }
+                });
+            } catch (e) {
+                alert('피드백 요청 중 오류가 발생했습니다: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                document.getElementById('submit-spinner-feedback').style.display = 'none';
+            }
+        });
+
+        // Final submit
+        document.getElementById('final-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const contentText = document.getElementById('contentText-final').value.trim();
+            if (!contentText) {
+                 alert("영작한 내용을 입력하거나 이미지 업로드 후 실행해주세요!");
+                 return;
+            }
+            const btn = document.getElementById('submit-final-btn'),
+                  sp = document.getElementById('submit-spinner-final');
+            btn.disabled = true;
+            sp.style.display = 'inline-block';
+            try {
+                const res = await fetch(`${WORKER_URL}/api/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contentText })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || '알 수 없는 서버 오류');
+                }
+
+                const { feedback, modelAnswer } = await res.json();
+                const cont = document.getElementById('final-result');
+                cont.innerHTML = `
+                  <p style="text-align: left;">
+                    📢 AI는 실수를 할 수 있습니다. 꼭 생성된 내용을 확인 후 필요한 부분은 수정하셔서 이용해주세요~!
+                  </p>
+                  <div class="corrected-section" id="fn-box">
+                    <h3><i class="fas fa-check-circle"></i> 수정글</h3>
+                    <div class="edit-instruction">내용에서 원하는 부분을 수정하려면 Edit 버튼을 누른 후 입력하시고 Save를 눌러 저장해주세요.</div>
+                    <div class="corrected-content" id="fn-corrected">${modelAnswer.replace(/\n/g,'<br>')}</div>
+                  </div>
+                  <div class="btn-group" id="fn-edit-group"></div>
+                  <div class="audio-controls-area">
+                      <button id="tts-play-btn">원어민 음성 듣기</button><span id="tts-spinner" class="spinner"></span>
+                      <audio id="tts-audio-final" controls style="display:none;"></audio>
+                      <a id="tts-download-btn" style="display:none;">음원 다운로드</a>
+                  </div>
+                  <div class="print-button-bottom">
+                      <a id="print-final-btn" class="button">인쇄</a>
+                  </div>
+                  <div class="print-options-inline" id="print-options-final" style="display:none;">
+                      <label><input type="checkbox" id="print_orig_fn" checked> 원본</label>
+                      <label><input type="checkbox" id="print_corr_fn" checked> 수정글</label>
+                      <button id="confirm-print-final-btn">Confirm</button>
+                  </div>
+                `;
+
+                // Edit/Save 버튼 추가 (최종 수정글)
+                const fnContent = document.getElementById('fn-corrected');
+                fnContent.setAttribute('contenteditable', 'false');
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit';
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = 'Save';
+                saveBtn.style.display = 'none';
+                const wrapper = document.getElementById('fn-edit-group');
+                wrapper.append(editBtn, saveBtn);
+                editBtn.addEventListener('click', () => {
+                    fnContent.setAttribute('contenteditable', 'true');
+                    editBtn.style.display = 'none';
+                    saveBtn.style.display = 'inline-block';
+                    fnContent.focus();
+                });
+                saveBtn.addEventListener('click', () => {
+                    fnContent.setAttribute('contenteditable', 'false');
+                    saveBtn.style.display = 'none';
+                    editBtn.style.display = 'inline-block';
+                });
+                
+                // TTS
+                const playBtn = document.getElementById('tts-play-btn'),
+                      spinner = document.getElementById('tts-spinner'),
+                      dl = document.getElementById('tts-download-btn'),
+                      audio = document.getElementById('tts-audio-final');
+
+                playBtn.addEventListener('click', async () => {
+                    playBtn.disabled = true;
+                    spinner.style.display = 'inline-block';
+                    try {
+                        const textFinal = document.getElementById('fn-corrected').innerText;
+                        const r = await fetch(`${WORKER_URL}/api/tts`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: textFinal })
+                        });
+
+                        if (!r.ok) {
+                            const errorData = await r.json();
+                            throw new Error(errorData.error || '음성 파일 생성 실패');
+                        }
+
+                        const blob = await r.blob();
+                        const url = URL.createObjectURL(blob);
+                        audio.src = url;
+                        audio.style.display = 'block';
+                        dl.style.display = 'inline-block';
+                        const userName = document.getElementById('user-name-final').value.trim() || 'writing';
+                        dl.href = url;
+                        dl.download = `${userName}.mp3`;
+                    } catch (e) {
+                        alert('TTS 에러: ' + e.message);
+                    } finally {
+                        playBtn.disabled = false;
+                        spinner.style.display = 'none';
+                    }
+                });
+                
+                // Print inline final
+                document.getElementById('print-final-btn').addEventListener('click', () => {
+                    document.getElementById('print-options-final').style.display = 'flex';
+                });
+                
+                document.getElementById('confirm-print-final-btn').addEventListener('click', () => {
+                    const orig = document.getElementById('print_orig_fn').checked;
+                    const corr = document.getElementById('print_corr_fn').checked;
+                    const name = document.getElementById('user-name-final').value;
+                    const school = document.getElementById('user-school-final').value;
+                    
+                    document.getElementById('print-options-final').style.display = 'none';
+                    
+                    if (orig && window.finalFileURL && window.finalFileURL.startsWith('blob:')) {
+                        getRotatedImageForPrint(window.finalFileURL, (rotatedImageUrl) => {
+                            generateAndPrintHTML(rotatedImageUrl, orig, false, corr, name, school, 'final');
+                        });
+                    } else {
+                        generateAndPrintHTML(window.finalFileURL, orig, false, corr, name, school, 'final');
+                    }
+                });
+
+            } catch (e) {
+                alert('최종 결과물 요청 중 오류가 발생했습니다: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                document.getElementById('submit-spinner-final').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
