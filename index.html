@@ -500,7 +500,7 @@
 
         .overview-category > div {
             padding-left: 1.5em;
-            text-indent: -1.5em;
+            text-indent: 0;
         }
 
         .grammar {
@@ -1012,6 +1012,7 @@
         </section>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
     <script>
         const WORKER_URL = 'https://writeback2.sehyunglee2015.workers.dev';
         // const PROXY_URL = WORKER_URL + '/proxy'; // 이제 /proxy를 직접 사용하므로 이 변수는 불필요
@@ -1267,25 +1268,53 @@
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                const isLandscape = img.width > img.height;
-                
-                if (isLandscape) {
-                    canvas.width = img.height;
-                    canvas.height = img.width;
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.rotate(90 * Math.PI / 180);
-                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
-                } else {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                }
-                
-                const rotatedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-                callback(rotatedDataUrl);
+                // EXIF 데이터를 사용하여 orientation을 감지합니다.
+                EXIF.getData(img, function() {
+                    const orientation = EXIF.getTag(this, 'Orientation');
+                    let rotation = 0;
+                    let rotateNeeded = false;
+                    
+                    // Orientation 값에 따른 회전 각도 설정 (필요한 경우에만 회전)
+                    if (orientation && orientation !== 1) {
+                        if (orientation === 6) { // 시계방향 90도
+                            rotation = 90;
+                            rotateNeeded = true;
+                        } else if (orientation === 8) { // 시계반대방향 90도 (-90도)
+                            rotation = -90;
+                            rotateNeeded = true;
+                        } else if (orientation === 3) { // 180도 회전
+                            rotation = 180;
+                            rotateNeeded = true;
+                        }
+                        // 기타 orientation 값에 따른 추가 처리가 필요하면 여기서 추가
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    if (rotateNeeded) {
+                        if (Math.abs(rotation) === 90) {
+                            canvas.width = img.height;
+                            canvas.height = img.width;
+                            ctx.translate(canvas.width/2, canvas.height/2);
+                            ctx.rotate(rotation * Math.PI/180);
+                            ctx.drawImage(img, -img.width/2, -img.height/2);
+                        } else if (rotation === 180) {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.translate(canvas.width/2, canvas.height/2);
+                            ctx.rotate(Math.PI);
+                            ctx.drawImage(img, -img.width/2, -img.height/2);
+                        }
+                    } else {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                    }
+                    
+                    const rotatedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                    callback(rotatedDataUrl);
+                });
             };
             img.src = imageUrl;
         }
