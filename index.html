@@ -415,7 +415,7 @@
                         <input type="checkbox" id="print_orig_ocr" checked /> 원본 이미지
                     </label>
                     <label>
-                        <input type="checkbox" id="print_ocr_fn" checked /> OCR 텍스트
+                        <input type="checkbox" id="print_ocr" checked /> OCR 텍스트
                     </label>
                 </div>
                 <div class="print-input-group">
@@ -456,10 +456,10 @@
                 <h3>인쇄 옵션 (최종 결과물)</h3>
                 <div class="print-checkbox-group">
                     <label>
-                        <input type="checkbox" id="print_orig_fn" checked /> 원본 이미지
+                        <input type="checkbox" id="print_orig_final" checked /> 원본 이미지
                     </label>
                     <label>
-                        <input type="checkbox" id="print_corr_fn" checked /> 교정된 텍스트
+                        <input type="checkbox" id="print_corr_final" checked /> 교정된 텍스트
                     </label>
                 </div>
                 <div class="print-input-group">
@@ -507,7 +507,7 @@
         const resetRotationBtn = document.getElementById('reset-rotation-btn');
         let currentRotation = 0;
         let originalImageUrl = ''; // 원본 URL (Blob 또는 Data URL)
-        let originalBase64Image = ''; // Base64 인코딩된 원본 이미지 데이터
+        let originalBase64Image = ''; // Base64 인코딩된 원본 이미지 데이터 (헤더 제외)
         let originalMimeType = ''; // 원본 이미지 MIME 타입
 
         const ocrResultTextarea = document.getElementById('ocr-result');
@@ -563,13 +563,14 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 imagePreview.src = e.target.result;
-                originalImageUrl = e.target.result; // Data URL 저장
-                originalBase64Image = e.target.result.split(',')[1]; // Base64 데이터만 저장
+                originalImageUrl = e.target.result; // Data URL 저장 (인쇄용)
+                originalBase64Image = e.target.result.split(',')[1]; // Base64 데이터만 저장 (API 전송용)
                 imagePreviewContainer.style.display = 'block';
                 currentRotation = 0; // 새 이미지 업로드 시 회전 초기화
                 imagePreview.style.transform = `rotate(0deg)`;
                 ocrResultTextarea.value = ''; // OCR 결과 초기화
                 finalResultTextarea.value = ''; // 최종 결과물 초기화
+                correctionPromptTextarea.value = ''; // 교정 프롬프트 초기화
             };
             reader.readAsDataURL(file);
         }
@@ -602,7 +603,7 @@
             ocrResultTextarea.value = 'OCR 인식 중...';
 
             try {
-                // 현재 회전 상태를 반영한 이미지 데이터 생성 (Blob 또는 Data URL -> Base64)
+                // 현재 회전 상태를 반영한 이미지 데이터 생성 (Canvas를 통해 회전된 이미지의 Base64)
                 const rotatedCanvas = document.createElement('canvas');
                 const img = new Image();
                 img.src = imagePreview.src;
@@ -692,7 +693,7 @@
                     },
                     body: JSON.stringify({
                         ocrText: ocrText,
-                        originalImageBase64: originalBase64Image,
+                        originalImageBase64: originalBase64Image, // 원본 Base64 데이터 전송
                         mimeType: originalMimeType,
                         instructionPrompt: instructionPrompt
                     })
@@ -706,8 +707,11 @@
                 const data = await response.json();
                 finalResultTextarea.value = data.correctedText;
                 finalResultTextarea.readOnly = false; // 편집 가능하게
-                // ... (인쇄 옵션 관련 기존 로직) ...
-                document.getElementById('print-final-btn').style.display = 'flex'; // 인쇄 버튼 활성화
+                
+                // 최종 결과물 생성 후 인쇄 버튼 활성화
+                printFinalBtn.style.display = 'flex';
+
+
             } catch (e) {
                 alert('최종 결과물 요청 중 오류가 발생했습니다: ' + e.message);
             } finally {
@@ -754,7 +758,7 @@
             }
         });
 
-        // 인쇄 관련 함수 및 이벤트 리스너 (기존 로직 유지)
+        // 인쇄 관련 함수 및 이벤트 리스너
         function generateAndPrintHTML(imageUrl, printOriginal, printOcr, printCorrected, userName, userSchool, type) {
             const printWindow = window.open('', '_blank');
             if (!printWindow) {
@@ -831,6 +835,7 @@
             // printWindow.close(); // 인쇄 후 닫을지 여부는 UX에 따라 결정
         }
 
+        // 인쇄 시 현재 회전된 이미지 상태를 반영하기 위한 함수
         function getRotatedImageForPrint(originalDataUrl, callback) {
             const img = new Image();
             img.src = originalDataUrl;
@@ -871,7 +876,7 @@
         // OCR 인쇄 확인 버튼
         document.getElementById('confirm-print-ocr-btn').addEventListener('click', () => {
             const orig = document.getElementById('print_orig_ocr').checked;
-            const ocr = document.getElementById('print_ocr_fn').checked; // 오타 수정: print_ocr_fn -> print_ocr
+            const ocr = document.getElementById('print_ocr').checked; // 올바른 ID: print_ocr
             const name = document.getElementById('user-name-ocr').value;
             const school = document.getElementById('user-school-ocr').value;
 
@@ -897,14 +902,14 @@
 
         // 최종 결과물 인쇄 확인 버튼
         document.getElementById('confirm-print-final-btn').addEventListener('click', () => {
-            const orig = document.getElementById('print_orig_fn').checked;
-            const corr = document.getElementById('print_corr_fn').checked;
+            const orig = document.getElementById('print_orig_final').checked; // 올바른 ID: print_orig_final
+            const corr = document.getElementById('print_corr_final').checked; // 올바른 ID: print_corr_final
             const name = document.getElementById('user-name-final').value;
             const school = document.getElementById('user-school-final').value;
 
             document.getElementById('print-options-final').style.display = 'none';
 
-            if (orig && originalImageUrl && originalImageUrl.startsWith('data:')) { // finalFileURL 대신 originalImageUrl 사용
+            if (orig && originalImageUrl && originalImageUrl.startsWith('data:')) {
                 getRotatedImageForPrint(originalImageUrl, (rotatedImageUrl) => {
                     generateAndPrintHTML(rotatedImageUrl, orig, false, corr, name, school, 'final');
                 });
